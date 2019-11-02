@@ -1,0 +1,77 @@
+{% extends "layout.html" %}
+{% block content %}
+<div class="col-md-2">
+    <div class="content-section">
+        {% if post_prev %}
+            <h5 class="text-truncate"><a href="{{ url_for('post_show',post_id=post_prev.id) }}">{{ post_prev.title }}</a></h5>
+            <p class="text-muted text-truncate">{{ post_prev.subtitle }}</p>
+        {% else %}
+            ...
+        {% endif %}
+    </div>
+</div>
+<div class="col-md-8">
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <div class="alert alert-{{ category }}">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+    <div class="content-section">
+        <h2><a href="{{ url_for('post_edit',post_id=post.id) }}">{{ post.title }}</a></h2>
+        <h5>{{ post.subtitle }}</h5>
+        <div class="article-metadata d-flex">
+            <p class="mr-2 text-muted">由 {{ post.author.name }} 
+                于 {{ post.created_at.strftime('%Y-%m-%d %H:%M') }}发布，
+                {{ post.edited_at.strftime('%Y-%m-%d %H:%M') }}完成最后一次
+                <a href="{{ url_for('post_edit', post_id=post.id) }}">编辑</a></p>
+        </div>
+        <p>{{ post.body|safe }}</p>
+        <div class="article-footer d-flex justify-content-between">
+            <small class="text-muted"><i class="fa fa-eye fa-fw"></i>已被阅览 {{ post.view_count }} 次</small>
+            <div class="list-inline">
+                {% for kwd in post.keywords%}
+                    <div class="list-inline-item article-keyword" ><a style="color:#007acc;" href="{{ url_for('post_list_by_tag', post_tag=kwd) }}">{{ kwd }}</a></div>
+                {% endfor %}
+            </div>
+            <a href="#" class="small font-italic font-weight-light" id="sdel" data-toggle="modal" data-target="#deleteModal{{ post.id }}">删除</a>
+        </div>
+         <!--<p>{{ post.comment }}</p>-->
+    </div>
+    <!--Modal-->
+    <div class="modal fade" id="deleteModal{{ post.id }}" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="deleteModalLabel">请确认是否要删除以下文章？</h5>
+                    <button type="button" class="close" data-dismiss="modal">
+                        <span>&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <h4 class="article-title">{{ post.title }}</h4>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary btn-sm" data-dismiss="modal">取消</button>
+                    <form action="{{ url_for('post_delete', post_id=post.id) }}" method="POST">
+                        <input class="btn btn-danger btn-sm" type="submit" value="删除"></input>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="col-md-2">
+    <div class="content-section">
+        {% if post_next %}
+        <h5 class="text-truncate"><a href="{{ url_for('post_show',post_id=post_next.id) }}">{{ post_next.title }}</a></h5>
+            <p class="text-muted text-truncate">{{ post_next.subtitle }}</p>
+        {% else %}
+            ...
+        {% endif %}
+    </div>
+</div>
+{% endblock content %}

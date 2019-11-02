@@ -1,0 +1,90 @@
+{% extends "layout.html" %}
+{% block content %}
+<div class="col-md-8">
+    <div class="row pl-3">
+        <a href="http://192.168.3.6:8889/tree" target="_blank"><i class="fa fa-space-shuttle fa-fw"></i></a>
+        <a href="http://localhost:8888/tree" target="_blank"><i class="fa fa-grav fa-fw"></i></a>
+        <a href="#" target="_blank"><i class="fa fa-eercast fa-fw"></i></a> <!--预留的链接-->
+        <a href="#" target="_blank"><i class="fa fa-superpowers fa-fw"></i></a><!--预留的链接-->
+        <a href="#" target="_blank"><i class="fa fa-wpexplorer fa-fw"></i></a><!--预留的链接-->
+        <a href="#" target="_blank"><i class="fa fa-cogs fa-fw"></i></a><!--预留的链接-->
+        <a href="#" target="_blank"><i class="fa fa-fighter-jet fa-fw"></i></a><!--预留的链接-->
+        <a href="#" target="_blank"><i class="fa fa-globe fa-fw"></i></a><!--预留的链接-->
+        <a href="#" target="_blank"><i class="fa fa-mortar-board fa-fw"></i></a><!--预留的链接-->
+        <a href="#" target="_blank"><i class="fa fa-rocket fa-fw"></i></a><!--预留的链接-->
+    </div>
+    <embed height="700" width="100%" src="http://ksmao-IdeaCentre-Q190:8889/tree"></embed>
+</div>
+<div class="col-md-4">
+    <div class="content-section" style="min-width: 310px;"> <!--310是根据日历表格的大小推算出来的-->
+        <h3>畅所欲言</h3>
+        <p class="text-muted">一本好书需要你一页一页翻到最后
+            <ul class="list-group">
+                <li class="list-group-item list-group-item-light">本页</li>
+                <li class="list-group-item list-group-item-light">
+                    热爱科学，填写ID?
+                </li>
+                <li class="list-group-item list-group-item-light">标签云</li>
+                <li class="list-group-item list-group-item-light"><img class="tagcloud" src="{{ url_for('static',filename='post/wordcloud/tags.png') }}"></li>
+                <li class="list-group-item list-group-item-light">日历</li>
+                <li class="list-group-item list-group-item-light">
+                    <table class="table table-bordered table-calendar">
+                        <!--<tr>
+                            <th colspan="7">{{ today.strftime('%Y-%m-%d') }}</th>
+                        </tr>-->
+                        {% set week_addr = ['日', '一', '二', '三', '四', '五', '六'] %}
+                        <tr>
+                            {% for addr in week_addr %}
+                                <th>{{addr}}</th>
+                            {% endfor %}
+                        </tr>
+                        {% for weeks in calendar %}
+                        <tr>
+                            {% for day in weeks %}
+                                {% if day == today.day and day in posted_date %}
+                                    <td style="background-color:#007bff;border-radius: 4px;">
+                                        <a style="color:black;" href="{{ url_for('post_list_by_date', post_day=day) }}">{{ day }}</a>
+                                    </td>    
+                                {% elif day in posted_date %}
+                                    <td style="background-color:#bcd7f3;border-radius: 4px;">
+                                        <a href="{{ url_for('post_list_by_date', post_day=day) }}">{{ day }}</a>
+                                    </td>
+                                {% elif day == today.day %}
+                                    <td style="background-color:#007bff;border-radius: 4px;">{{ day }}</td>
+                                {% elif day == 0 %}
+                                    <td>&nbsp</td>                                                                           
+                                {% else %}
+                                    <td>{{ day }}</td>
+                                {% endif %}
+                            {% endfor %}
+                        </tr>
+                        {% endfor %}
+                    </table>
+                </li>
+                <li class="list-group-item list-group-item-light">外链</li>
+                <li class="list-group-item list-group-item-light">
+                    <a href="https://github.com/highwindmx?tab=repositories" target="_blank">
+                        <i class="fa fa-github fa-2x fa-fw"></i>
+                    </a>
+                    <a class="popup" href="#">
+                        <i class="fa fa-wechat fa-2x fa-fw"></i>
+                        <div class="popup-img p-3 row justify-content-center"><!--  target="_blank"-->
+                            <img src="http://picpool-1255373220.cossh.myqcloud.com/Blog_Hexo_CodingNet/2017-11-01_wechatReward.jpg">
+                        </div>
+                    </a>
+                    <a href="https://www.bilibili.com/video/av55738332" target="_blank">
+                        <i class="fa fa-video-camera fa-2x fa-fw"></i>
+                    </a>
+                    <a href="https://i.youku.com/highwindmx" target="_blank">
+                        <i class="fa fa-play-circle-o fa-2x fa-fw"></i>
+                    </a>
+                    <a href="mailto:highwindmx@126.com?subject=有些想法&body=我想对你说" target="_blank">
+                        <i class="fa fa-envelope-o fa-2x fa-fw"></i>                        
+                    </a>
+                </li>
+            </ul>
+        </p>
+    </div>
+</div>
+{% endblock content %}
+

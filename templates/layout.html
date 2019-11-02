@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+        {% if title %}
+            <title>{{ title }}</title>
+        {% else %}
+            <title>Powered by Mlog</title>
+        {% endif %}
+        <link rel="shortcut icon" href="{{ url_for('static', filename='private/favicon/mlog.ico') }}">
+
+        <!--加载JS-->
+        <script src="{{ url_for('static', filename='public/jquery-3.3.1.slim.min.js') }}"></script>
+        <script src="{{ url_for('static', filename='public/popper.min.js') }}"></script>
+        <script src="{{ url_for('static', filename='vendor/bootstrap-4.3.1-dist/js/bootstrap.js') }}"></script>
+        <!--<script src="{{ url_for('static', filename='vendor/ckeditor-4.9.2-full/ckeditor.js') }}"></script>-->
+        {{ ckeditor.load(custom_url=url_for('static', filename='vendor/ckeditor-4.13.0-full/ckeditor.js')) }}
+        <script src="{{ url_for('static', filename='vendor/highlightjs/highlight.min.js') }}"></script>
+        <script>hljs.initHighlightingOnLoad();</script>
+        <!--加载CSS-->
+        <link rel="stylesheet" href="{{ url_for('static', filename='vendor/bootstrap-4.3.1-dist/css/bootstrap.css') }}">
+        <link rel="stylesheet" href="{{ url_for('static', filename='vendor/highlightjs/default.min.css') }}">
+        <link rel="stylesheet" href="{{ url_for('static', filename ='vendor/font-awesome-4.7.0/css/font-awesome.min.css') }}" type="text/css">
+        <link rel="stylesheet" href="{{ url_for('static', filename='private/style.css') }}">
+    </head>
+    <body>
+        <header class="site-header">
+            <nav class="navbar navbar-expand-md navbar-dark bg-steel fixed-top">
+                <div class="container">
+                    <a class="navbar-brand mr-4" href="/">Mlog</a>
+                    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarToggle">
+                        <span class="navbar-toggler-icon"></span>
+                    </button>
+                    <div class="collapse navbar-collapse" id="navbarToggle">
+                        <ul class="navbar-nav mr-auto">
+                            <!--<a class="nav-item nav-link" href="/">首页</a>-->
+                            <li class="nav-item active">
+                                <a class="nav-link" href="{{ url_for('post_new') }}"><i class="fa fa-pencil fa-fw"></i>写</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="{{ url_for('post_list') }}"><i class="fa fa-th-list fa-fw"></i>列</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="{{ url_for('post_list_by_tag',post_tag='集合') }}"><i class="fa fa-suitcase fa-fw"></i>集</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="{{ url_for('post_timeline') }}"><i class="fa fa-clock-o fa-spin fa-fw"></i>时</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="{{ url_for('science') }}"><i class="fa fa-flask fa-fw"></i>科</a>
+                            </li>
+                        </ul>
+                        <!--右侧部分-->
+                        <div class="navbar-nav">
+                            <form class="form-inline my-2 my-lg-0" action="{{ url_for('post_search') }}" method="POST">
+                                {{ forms.hidden_tag() }}
+                                <div>
+                                    {% if forms.search_term.errors %}
+                                        {{ forms.search_term(class='form-control mr-sm-2 is-invalid',type='search',placeholder='有些啥？') }}
+                                        <div class="invalid-feedback">
+                                            {% for error in forms.search_term.errors %}
+                                                <span>{{ error }}</span><!--但是此次如何反馈国际化（中文）错误提示呢？-->
+                                            {% endfor %}
+                                        </div>
+                                    {% else %}
+                                        <i class="fa fa-search fa-flip-horizontal fa-fw"></i>
+                                        {{ forms.search_term(class='form-control mr-sm-2',type='search',placeholder='有些啥？') }}
+                                    {% endif %}     
+                                </div>
+                                <div>
+                                    {{ forms.submit(class='btn btn-outline-secondary my-2 my-sm-0 mr-4') }}
+                                </div>
+                            </form>
+                            <a class="nav-item nav-link" href="{{ url_for('post_show',post_id='5da7f71637f2bc83802d66b2') }}">
+                                <i class="fa fa-info fa-border fa-fw"></i>约
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </nav>
+        </header>
+
+        <main role="main" class="container">
+            <div class="row">
+                {% block content %}
+                {% endblock content %}
+            </div>
+        </main>
+        
+    </body>
+</html>

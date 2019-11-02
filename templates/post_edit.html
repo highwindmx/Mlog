@@ -1,0 +1,103 @@
+{% extends "layout.html" %}
+{% block content %}
+<div class="col-md-12">
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <div class="alert alert-{{ category }}">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+    <form method="POST" action="">
+        {{ form.hidden_tag() }} <!--.hidden_tag目的是使用secret-key保护不受cookie攻击？-->
+        <fieldset class="form-group">
+            <!--<legend class="border-bottom mb-4">{{ legend_title }}</legend>-->
+            <div class="form-group">
+                {{ form.headline.label(class='form-control-label') }}
+                {% if form.headline.errors %}
+                    {{ form.headline(class='form-control form-control-lg is-invalid') }}
+                    <div class="invalid-feedback">
+                        {% for error in form.headline.errors %}
+                            <span>{{ error }}</span><!--但是此次如何反馈国际化（中文）错误提示呢？-->
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    {{ form.headline(class='form-control form-control-lg') }}
+                {% endif %}     
+            </div>
+            <div class="form-group">
+                {{ form.content.label(class='form-control-label') }}
+                {% if form.content.errors %}
+                    {{ form.content(class='form-control form-control-lg is-invalid') }}
+                    <div class="invalid-feedback">
+                        {% for error in form.content.errors %}
+                            <span>{{ error }}</span>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    {{ form.content(class='form-control form-control-lg') }}
+                {% endif %}
+            </div>
+            <div class="form-group">
+                {{ form.summary.label(class='form-control-label') }}
+                {% if form.summary.errors %}
+                    {{ form.summary(class='form-control form-control-lg is-invalid') }}
+                    <div class="invalid-feedback">
+                        {% for error in form.summary.errors %}
+                            <span>{{ error }}</span><!--但是此次如何反馈国际化（中文）错误提示呢？-->
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    {{ form.summary(class='form-control form-control-lg') }}
+                {% endif %}     
+            </div>
+            <div class="form-group">
+                {{ form.tags.label(class='form-control-label') }}
+                {% if form.tags.errors %}
+                    {{ form.tags(class='form-control form-control-lg is-invalid') }}
+                    <div class="invalid-feedback">
+                        {% for error in form.tags.errors %}
+                            <span>{{ error }}</span><!--但是此次如何反馈国际化（中文）错误提示呢？-->
+                        {% endfor %}
+                    </div>
+                {% else %}
+                    {{ form.tags(class='form-control form-control-lg') }}
+                {% endif %}     
+            </div>
+        </fieldset>
+        <div class="form-group">
+            {{ form.submit(class='btn btn-outline-info') }}
+        </div>
+    </form>
+    {{ ckeditor.config(name='content',
+                               custom_config="
+                                        language:'zh-cn',
+                                        uiColor:'#C7EDCC',
+                                        height:360,
+                                        toolbar: [
+                                                    { name: 'clipboard', items: [ 'Undo', 'Redo','-', 'Cut', 'Copy', 'Paste', 'PasteText', 'PasteFromWord'] },
+                                                    { name: 'editing', items: [ 'Find', 'Replace', '-', 'SelectAll', '-', '-', 'Scayt' ] },
+                                                    { name: 'about', items: [ 'Language' , 'About', 'ShowBlocks'] },
+                                                    { name: 'document', items: [ 'NewPage', 'Templates' ,'-', 'Maximize' ,'Preview', 'Save'] },
+                                                    { name: 'tools', items: [ 'Source'] },
+                                                    '/',
+                                                    { name: 'paragraph', items: [ 'JustifyLeft', 'JustifyCenter', 'JustifyRight', 'JustifyBlock', '-', 'NumberedList', 'BulletedList', '-', 'Outdent', 'Indent', '-', 'BidiLtr', 'BidiRtl', 'HorizontalRule','PageBreak'] },
+                                                    { name: 'links', items: [ 'Link', 'Unlink', 'Anchor' ] },
+                                                    { name: 'insert', items: [ 'Table', 'Image', 'CodeSnippet', 'Flash', 'Smiley', 'SpecialChar' ] },
+                                                    { name: 'element', items: ['Blockquote', 'CreateDiv', 'Iframe', '-'] },
+                                                    { name: 'forms', items: [ 'Form', 'Checkbox', 'Radio', 'TextField', 'Textarea', 'Select', 'Button', 'ImageButton', 'HiddenField' ] },
+                                                    '/',
+                                                    { name: 'basicstyles', items: [ 'CopyFormatting', 'RemoveFormat' ,'Bold', 'Italic', 'Underline', 'Strike', 'Subscript', 'Superscript'] },
+                                                    { name: 'styles', items: [ 'Styles', 'Format', 'Font', 'FontSize' ] },
+                                                    { name: 'colors', items: [ 'TextColor', 'BGColor' ] },		
+                                                    
+                                        ],
+                                        toolbarCanCollapse:true,
+                                        removeDialogTabs:'image:advanced;image:Link',
+                                        extraPlugins:'codesnippet,imagerotate',
+                               ") }}
+</div>                               
+{% endblock content %}
+
