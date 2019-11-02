@@ -3,7 +3,8 @@ __pycache__/
 *.py[cod]
 *$py.class
 
-static/post/*
+static/post/uploaded/image-*
+static/post/wordcloud/tags.png
 
 # C extensions
 *.so
