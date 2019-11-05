@@ -71,33 +71,48 @@
             {{ form.submit(class='btn btn-outline-info') }}
         </div>
     </form>
-    {{ ckeditor.config(name='content',
-                               custom_config="
-                                        language:'zh-cn',
-                                        uiColor:'#C7EDCC',
-                                        height:360,
-                                        toolbar: [
-                                                    { name: 'clipboard', items: [ 'Undo', 'Redo','-', 'Cut', 'Copy', 'Paste', 'PasteText', 'PasteFromWord'] },
-                                                    { name: 'editing', items: [ 'Find', 'Replace', '-', 'SelectAll', '-', '-', 'Scayt' ] },
-                                                    { name: 'about', items: [ 'Language' , 'About', 'ShowBlocks'] },
-                                                    { name: 'document', items: [ 'NewPage', 'Templates' ,'-', 'Maximize' ,'Preview', 'Save'] },
-                                                    { name: 'tools', items: [ 'Source'] },
-                                                    '/',
-                                                    { name: 'paragraph', items: [ 'JustifyLeft', 'JustifyCenter', 'JustifyRight', 'JustifyBlock', '-', 'NumberedList', 'BulletedList', '-', 'Outdent', 'Indent', '-', 'BidiLtr', 'BidiRtl', 'HorizontalRule','PageBreak'] },
-                                                    { name: 'links', items: [ 'Link', 'Unlink', 'Anchor' ] },
-                                                    { name: 'insert', items: [ 'Table', 'Image', 'CodeSnippet', 'Flash', 'Smiley', 'SpecialChar' ] },
-                                                    { name: 'element', items: ['Blockquote', 'CreateDiv', 'Iframe', '-'] },
-                                                    { name: 'forms', items: [ 'Form', 'Checkbox', 'Radio', 'TextField', 'Textarea', 'Select', 'Button', 'ImageButton', 'HiddenField' ] },
-                                                    '/',
-                                                    { name: 'basicstyles', items: [ 'CopyFormatting', 'RemoveFormat' ,'Bold', 'Italic', 'Underline', 'Strike', 'Subscript', 'Superscript'] },
-                                                    { name: 'styles', items: [ 'Styles', 'Format', 'Font', 'FontSize' ] },
-                                                    { name: 'colors', items: [ 'TextColor', 'BGColor' ] },		
-                                                    
-                                        ],
-                                        toolbarCanCollapse:true,
-                                        removeDialogTabs:'image:advanced;image:Link',
-                                        extraPlugins:'codesnippet,imagerotate',
-                               ") }}
+    <script>
+            var editor = CKEDITOR.replace( "content", { //注意这里一定要用和form里用到的名字（如content）一致
+                language:'zh-cn',
+                uiColor:'#C7EDCC',
+                height:360,
+                toolbarCanCollapse:true,
+                toolbar: [
+                        { name: 'clipboard', items: [ 'Undo', 'Redo','-', 'Cut', 'Copy', 'Paste', 'PasteText', 'PasteFromWord'] },
+                        { name: 'editing', items: [ 'Find', 'Replace', '-', 'SelectAll', '-', '-', 'Scayt' ] },
+                        { name: 'about', items: [ 'Language' , 'About', 'ShowBlocks'] },
+                        { name: 'document', items: [ 'NewPage', 'Templates' ,'-', 'Maximize' ,'Preview', 'Save'] },
+                        { name: 'tools', items: [ 'Source'] },
+                        { name: 'forms', items: [ 'Form', 'Checkbox', 'Radio', 'TextField', 'Textarea', 'Select', 'Button', 'ImageButton', 'HiddenField' ] },
+                        '/',
+                        { name: 'paragraph', items: [ 'JustifyLeft', 'JustifyCenter', 'JustifyRight', 'JustifyBlock', '-','liststyle', 'NumberedList', 'BulletedList', '-', 'Outdent', 'Indent', '-', 'BidiLtr', 'BidiRtl', 'HorizontalRule','PageBreak'] },
+                        { name: 'links', items: [ 'Link', 'Unlink', 'Anchor' ] },
+                        { name: 'insert', items: [ 'base64image', 'Table', 'Image', 'html5video', 'Flash', 'CodeSnippet', 'Smiley', 'EqnEditor', 'SpecialChar' ] },
+                        { name: 'element', items: ['Blockquote', 'CreateDiv', 'Iframe', '-'] },
+                        '/',
+                        { name: 'basicstyles', items: [ 'CopyFormatting', 'RemoveFormat' ,'Bold', 'Italic', 'Underline', 'Strike', 'Subscript', 'Superscript'] },
+                        { name: 'styles', items: [ 'Styles', 'Format', 'Font', 'FontSize','lineheight' ] },
+                        { name: 'colors', items: [ 'TextColor', 'BGColor' ] },
+                ],
+                // 
+                codeSnippet_theme: "monokai_sublime",
+                imageUploadUrl: "/post/files/upload",
+                filebrowserUploadUrl: "/post/files/upload",
+                filebrowserBrowseUrl: "",
+                // CSRF token header for XHR request
+                removeDialogTabs:'image:advanced;image:Link',
+                extraPlugins:'filebrowser,codesnippet,imagerotate,html5video,widget,widgetselection,clipboard,lineutils,\
+                              uploadwidget,uploadimage,tabletools,tableresize,eqneditor,\
+                              base64image,autoembed,autolink,undo,textmatch,lineheight,liststyle',
+                });
+            editor.addCommand( 'html5video', new CKEDITOR.dialogCommand( 'html5video' ) );
+            editor.ui.addButton && editor.ui.addButton( 'html5video', {
+                label   : 'Video',
+                command : 'html5video'
+            });
+        </script>
+    
+
 </div>                               
 {% endblock content %}
 

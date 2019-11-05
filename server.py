@@ -1,11 +1,13 @@
 import os,re,calendar
 from datetime import datetime
+from pathlib import Path
 from uuid import getnode as get_mac
 from flask import Flask, render_template, redirect, request, url_for, flash
 from flask import current_app, session, send_from_directory
 from flask_login import login_user, current_user, logout_user, login_required
 from flask_mongoengine import MongoEngine
 from mongoengine.queryset.visitor import Q
+from mongoengine.connection import get_connection
 from flask_ckeditor import CKEditor, CKEditorField, upload_success, upload_fail
 from wtforms.validators import DataRequired, Length
 from flask_wtf import FlaskForm
@@ -127,6 +129,15 @@ def expand_keywords(kwds):
             kwds_s.add("集合")
     return list(kwds_s)           
 
+def cal_base_size(db):
+    POST_IMAGE_FOLDER = os.path.join(current_app.root_path, 'static/post/uploaded/')
+    root_directory = Path(POST_IMAGE_FOLDER)
+    m_size = sum(f.stat().st_size for f in root_directory.glob('**/*') if f.is_file() )
+    d_size = get_connection().get_database('mlog').eval('db.stats()')["storageSize"]
+    def size2M(num):
+        return num/(1024*1024)
+    return size2M(d_size), size2M(m_size)
+
 ### 路径与视图
 @app.route('/')
 @app.route('/index')
@@ -152,7 +163,9 @@ def post_list():
             calendar=get_calendar(), 
             today=datetime.now(),
             posted_date=get_posted_dates(),
-            forms=formS
+            forms=formS,
+            database_size=cal_base_size(DataPost)[0],
+            mediabase_size=cal_base_size(DataPost)[1]
             )
 
 @app.route('/post/show/track')
@@ -166,7 +179,9 @@ def post_timeline():
             calendar=get_calendar(), 
             today=datetime.now(),
             posted_date=get_posted_dates(),
-            forms=formS
+            forms=formS,
+            database_size=cal_base_size(DataPost)[0],
+            mediabase_size=cal_base_size(DataPost)[1]
             )
 
 @app.route('/post/show/list/tag/<string:post_tag>')
@@ -180,7 +195,9 @@ def post_list_by_tag(post_tag):
             calendar=get_calendar(), 
             today=datetime.now(),
             posted_date=get_posted_dates(),
-            forms=formS
+            forms=formS,
+            database_size=cal_base_size(DataPost)[0],
+            mediabase_size=cal_base_size(DataPost)[1]
             )
 
 @app.route('/post/show/list/date/<int:post_day>')
@@ -197,7 +214,9 @@ def post_list_by_date(post_day):
             calendar=get_calendar(), 
             today=datetime.now(),
             posted_date=get_posted_dates(),
-            forms=formS
+            forms=formS,
+            database_size=cal_base_size(DataPost)[0],
+            mediabase_size=cal_base_size(DataPost)[1]
             )
 
 @app.route('/post/show/<string:post_id>')
@@ -311,7 +330,9 @@ def post_search():
             calendar=get_calendar(), 
             today=datetime.now(),
             posted_date=get_posted_dates(),
-            forms=formS
+            forms=formS,
+            database_size=cal_base_size(DataPost)[0],
+            mediabase_size=cal_base_size(DataPost)[1]
             )
 
 @app.route('/sci/')
