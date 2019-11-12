@@ -1,13 +1,15 @@
 import os,re,calendar
 from datetime import datetime
+import random
 from pathlib import Path
 from uuid import getnode as get_mac
 from flask import Flask, render_template, redirect, request, url_for, flash
-from flask import current_app, session, send_from_directory
+from flask import current_app, session, send_from_directory, jsonify
 from flask_login import login_user, current_user, logout_user, login_required
 from flask_mongoengine import MongoEngine
 from mongoengine.queryset.visitor import Q
 from mongoengine.connection import get_connection
+#from mongoengine import connect
 from flask_ckeditor import CKEditor, CKEditorField, upload_success, upload_fail
 from wtforms.validators import DataRequired, Length
 from flask_wtf import FlaskForm
@@ -20,7 +22,7 @@ net start mongodb # win启动mongod服务
 '''
 app = Flask(__name__)
 ### 配置文件
-app.config['SECRET_KEY'] = 'secret'
+app.config['SECRET_KEY'] = 'e850785d84bd17ae15dc2d130eea62be'
 app.config['CKEDITOR_SERVE_LOCAL'] = True
 app.config['CKEDITOR_FILE_UPLOADER'] = 'post_img_upload'
 app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 0 #用来强制刷新静态图片
@@ -89,6 +91,9 @@ class DataPost(db.Document):
         'ordering': ['-created_at']
     }
 
+class GameNim(db.Document):
+    layout = db.ListField()
+
 ### 使用函数
 def get_calendar():
     calendar.setfirstweekday(firstweekday=6) #0是周一，6是周日
@@ -138,6 +143,27 @@ def cal_base_size(db):
         return num/(1024*1024)
     return size2M(d_size), size2M(m_size)
 
+def gen_guess_num_list():
+    return random.sample(list(range(1,10)), 9)
+
+def gen_nim_list(rm=6,cm=8): #rm最好不要大于9，不然计算nim_num会进位
+    nim_list = []
+    r = random.randint(3,rm) # 3<=r<=6
+    for _ in range(r):
+        nim_list.append(random.randint(1,cm))
+    return nim_list
+
+def show_nim_stat(layout):
+    nim_num = 0
+    for n in layout:
+        nim_num += int(f'{n:b}')
+    if sum(layout) == 0:
+        return True, nim_num
+    return False, nim_num
+
+### 全局变量
+nim_game = GameNim()
+
 ### 路径与视图
 @app.route('/')
 @app.route('/index')
@@ -148,7 +174,7 @@ def index():
 
 @app.route('/user') # 最开始需要用这个方法作为注册和登录
 def user():
-    post_author = DataWriter(name="highwind")
+    post_author = DataWriter(name="maokk")
     post_author.save()
     return redirect(url_for("post_list"))
 
@@ -158,6 +184,7 @@ def post_list():
     page = request.args.get('page', 1, type=int)
     posts = DataPost.objects.order_by('-created_at').paginate(page=page, per_page=3) #每次只查询部分数据库内容，减少每次负荷 DataPost.objects.all()
     return render_template('post_show_mul.html',
+            sideinfo="post",
             posts=posts, 
             posts_count=DataPost.objects.count(),
             calendar=get_calendar(), 
@@ -174,6 +201,7 @@ def post_timeline():
     page = request.args.get('page', 1, type=int)
     posts = DataPost.objects.order_by('created_at').paginate(page=page, per_page=20) # 如果是 .all()则注意后面就不用.items去调用了
     return render_template('post_show_timeline.html',
+            sideinfo="post",
             posts=posts,
             posts_count=DataPost.objects.count(),
             calendar=get_calendar(), 
@@ -190,6 +218,7 @@ def post_list_by_tag(post_tag):
     page = request.args.get('page', 1, type=int)
     posts = DataPost.objects(keywords=post_tag).order_by('-created_at').paginate(page=page, per_page=3) #每次只查询部分数据库内容，减少每次负荷 DataPost.objects.all()
     return render_template('post_show_mul_by_tag.html',
+            sideinfo="post",
             posts=posts, 
             posts_count=DataPost.objects.count(),
             calendar=get_calendar(), 
@@ -209,6 +238,7 @@ def post_list_by_date(post_day):
     posts = DataPost.objects((Q(created_at__gte=date_start) & Q(created_at__lte=date_end)))\
         .order_by('-created_at').paginate(page=page, per_page=3) #每次只查询部分数据库内容，减少每次负荷 DataPost.objects.all()
     return render_template('post_show_mul.html',
+            sideinfo="post",
             posts=posts, 
             posts_count=DataPost.objects.count(),
             calendar=get_calendar(), 
@@ -244,7 +274,7 @@ def post_new():
         post.body = form.content.data
         post.body_plain = get_plaintext(form.content.data)
         post.edited_at = datetime.now()
-        post.author = DataWriter.objects(name='highwind').first()
+        post.author = DataWriter.objects(name='maokk').first()
         post.save()
         flash(f'文章 {form.headline.data} 已更新', 'success')
         return redirect(url_for('post_show', post_id=post.id))
@@ -272,7 +302,7 @@ def post_edit(post_id):
         post.body_plain = get_plaintext(form.content.data)
         post.edited_at = datetime.now()
         #post.author.append(post_author) #暂时不支持多作者编辑
-        post.author = DataWriter.objects(name='highwind').first()
+        post.author = DataWriter.objects(name='maokk').first()
         post.save()
         flash(f'文章 {form.headline.data} 已更新', 'success')
         return redirect(url_for('post_show', post_id=post.id))
@@ -304,10 +334,10 @@ def upload_file(filename):
 
 @app.route('/post/files/upload', methods=['POST'])
 def post_img_upload():
-    allowed_ext = ['jpg', 'jpeg', 'png', 'bmp', 'gif']
+    allowed_ext = ['.jpg', '.jpeg', '.png', '.bmp', '.gif','.mp4','.mov']
     POST_IMAGE_FOLDER = os.path.join(current_app.root_path, 'static/post/uploaded/')
     f = request.files.get('upload') # 注意 传入request.files.get()的键必须为'upload'， 这是CKEditor定义的上传字段name值。 
-    f_extension = f.filename.split('.')[1].lower()
+    f_extension = os.path.splitext(f.filename)[1].lower()
     if f_extension not in allowed_ext:
         return upload_fail(message=f'只允许以下格式图片（{str(allowed_ext)}）')
     f.save(os.path.join(POST_IMAGE_FOLDER, f.filename))
@@ -325,6 +355,7 @@ def post_search():
         posts = DataPost.objects(body_plain__icontains=swd).order_by('-created_at').paginate(page=page, per_page=3)
         # posts = DataPost.objects.search_text(swd).order_by('$text_score').paginate(page=page, per_page=3) # 目前还不支持中文
     return render_template('post_show_mul.html',
+            sideinfo="post",
             posts=posts, 
             posts_count=DataPost.objects.count(),
             calendar=get_calendar(), 
@@ -339,11 +370,60 @@ def post_search():
 def science():
     formS = FormSearch() 
     return render_template('science.html',
+            sideinfo="science",
+            posts_count=DataPost.objects.count(),
             calendar=get_calendar(), 
             today=datetime.now(),
             posted_date=get_posted_dates(),
-            forms=formS
+            forms=formS,
+            database_size=cal_base_size(DataPost)[0],
+            mediabase_size=cal_base_size(DataPost)[1]
             )
+
+@app.route('/game/')
+def game():
+    formS = FormSearch()
+    nim_game = GameNim.objects.first_or_404()
+    nim_game.layout = gen_nim_list()
+    nim_game.save()
+    return render_template('game.html',
+            sideinfo="game",
+            posts_count=DataPost.objects.count(),
+            calendar=get_calendar(), 
+            today=datetime.now(),
+            posted_date=get_posted_dates(),
+            forms=formS,
+            database_size=cal_base_size(DataPost)[0],
+            mediabase_size=cal_base_size(DataPost)[1],
+            num_lst=gen_guess_num_list(),
+            #nim_lst=gen_nim_list()
+            nim_lst=nim_game.layout
+            )
+
+@app.route('/game_guess_get_num')
+def get_numbers():
+    #now_time = request.args.get('now', 0, type=int)
+    number_list = gen_guess_num_list()
+    return jsonify(number_list)
+    
+@app.route('/game_nim_gen_list')
+def get_nim_list():
+    stone_string = request.args.get('stone', 0, type=tuple) #用tuple只是打散以后方便取值
+    # print(nim_game.layout, stone_string)
+    nim_game = GameNim.objects.first_or_404()
+    if stone_string:
+        stone = (int(stone_string[1]), int(stone_string[4])) #根据print(stone_string, type(stone_string))推算的 
+        nim_game.layout[stone[0]] = stone[1]  
+    else:
+        nim_game.layout = gen_nim_list()
+    win_or_loss, nim_num = show_nim_stat(nim_game.layout)
+    #print(nim_game.layout, sum(nim_game.layout))
+    nim_game.save()
+    return jsonify(
+            {'layout': render_template('game_nim_list.html', nim_lst = nim_game.layout),
+            'nim_num':nim_num,
+            'nim_w_o_l':win_or_loss}
+        )
 
 @app.errorhandler(404)
 def error_404(error):

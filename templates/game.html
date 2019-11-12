@@ -1,0 +1,129 @@
+{% extends "layout.html" %}
+{% block content %}
+<div class="col-md-8">
+    <div>
+        <ul class="nav nav-tabs" id="myTab" role="tablist">
+            <li class="nav-item">
+                <a class="nav-link active" id="guess-num-tab" data-toggle="tab" href="#guess-num">猜数字</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" id="nim-tab" data-toggle="tab" href="#nim">扔石头</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" id="darkchess-tab" data-toggle="tab" href="#darkchess">暗棋</a>
+            </li>
+        </ul>
+        <div class="tab-content ml-2" id="nav-tabContent">
+            <div class="tab-pane fade show active" id="guess-num">
+                <div class="text-center mt-4">
+                    <div class="text-muted m-3">输入记忆时间，点击开始，记住九个数字位置，按序点击:)</div>
+                    <div class="input-group mb-3">
+                        <div class="input-group-prepend">
+                          <span class="input-group-text" id="basic-addon1">记忆时间（秒）</span>
+                        </div>
+                        <input id="gn-momery-time-input" type="text" class="form-control" placeholder="请输入记忆时间（秒）" value="1">
+                    </div>
+                    <button class="btn btn-primary btn-sm" id="button-gn-st" style="min-width: 180px;">
+                        <h2 style="color: blanchedalmond;">开始</h2>
+                    </button>
+                    <button class="btn btn-warning btn-sm" id="button-gn-sh" style="min-width: 180px;">
+                        <h2 style="color: blanchedalmond;">显隐</h2>
+                    </button>
+                    <button class="btn btn-success btn-sm" id="button-gn-rd" style="min-width: 180px;">
+                        <!-- <a href="{{ url_for('game') }}"> -->
+                        <h2 style="color: blanchedalmond;">重来</h2>
+                    </button>
+                </div>                
+                <ul class="gnbox">
+                    {% for num in num_lst %}
+                    <li class="btn btn-lg btn-outline-secondary">
+                        <div id="{{loop.index0}}" class="box-f text-center" style="margin-top:36px;display:none;"><h3>{{num}}</h3></div>
+                    </li>
+                    {%endfor%}
+                </ul>
+                <script type="text/javascript">
+                    $(document).ready(function(){
+                        var clicked_num = "";
+                        $("#button-gn-st").click(function(){
+                            $(".box-f").show();
+                            var mt = $("input[id='gn-momery-time-input']").val()*1000;
+                            // console.log( $("#gn-momery-time-input").val()*1000 );
+                            // console.log( $("input[id='gn-momery-time-input']").val()*1000 );
+                            setTimeout(function() {
+                                $(".box-f").hide();
+                            }, mt);
+                        });
+                        $("#button-gn-sh").click(function(){
+                            $(".box-f").toggle();
+                            clicked_num = "";
+                        });
+                        $('#button-gn-rd').click(function(){
+                            var $SCRIPT_ROOT = {{ request.script_root|tojson|safe }};
+                            $.getJSON($SCRIPT_ROOT + '/game_guess_get_num', {
+                                now: new Date().getTime() // 一种刷新缓存的技巧
+                            },
+                            function(data) {
+                                for(i = 0; i < data.length; i++) { 
+                                    var new_num = data[i];
+                                    // console.log(new_num);
+                                    $("#" + i).html("<h3>" + new_num + "</h3>");
+                                }
+                            });
+                            clicked_num = "";
+                        });
+                        $('.btn-outline-secondary').click(function(){
+                            clicked_num = clicked_num + $(this).children().text();
+                            // console.log(clicked_num);
+                            $(this).children().show();
+                            if (clicked_num == "123456789") {
+                                alert("记性不错哟！！可以试试更短时间");
+                                clicked_num = "";
+                            } else if (clicked_num.length == 9 &&  clicked_num != "123456789") { 
+                                alert("手滑了吧？？重新试试吧！！！");
+                                clicked_num = "";
+                            }
+                        });
+                    });
+                </script>
+            </div>
+            <div class="tab-pane fade" id="nim">
+                <div class="text-center mt-4">
+                    <p class="text-muted m-3">每次必须从某一行中扔掉1颗以上(选中及右侧)的石子，最后谁先没石头扔算谁输！</p>
+                    <button class="btn btn-success btn-sm" id="button-nim-rd" style="min-width: 180px;">
+                            <h2 style="color: blanchedalmond;">重来</h2>
+                        </button>
+                    <span id="nim-player1">
+                        <h3>玩家1扔石头</h3><h3 class="nim-win-loss" style="display: none;">胜利</h3>
+                    </span>
+                    <span id="nim-player2" style="display: none;">
+                        <h3>玩家2扔石头</h3><h3 class="nim-win-loss" style="display: none;">胜利</h3>
+                    </span>
+                    <p id="nim-number" class="text-muted"></p>
+                    <ul id="nim-layout">
+                        {% set row = namespace(value=0) %}
+                        {% for i in nim_lst %}
+                        <li class="row m-2 list-unstyled" id="nim-row">
+                            <ul class="d-flex">
+                                {% for j in range(i) %}
+                                <li class="text-align-left m-2 list-unstyled" id="nim-col">
+                                    <button class="nim-stone-btn btn btn-secondary btn-xm" value="{{(row.value,j)}}"><i class="fas fa-egg"></i></button>
+                                </li>
+                                {% endfor %}
+                                {% set row.value = row.value + 1 %}
+                            </ul>
+                        </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </div>
+            <div class="tab-pane fade" id="darkchess">
+                <p> darkchess</p>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="col-md-4">
+    {% include "side_layout.html" %}
+</div>
+{% endblock content %}
+

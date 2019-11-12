@@ -3,8 +3,10 @@ __pycache__/
 *.py[cod]
 *$py.class
 
+templates/archive/*
 static/post/uploaded/image-*
 static/post/wordcloud/tags.png
+server hide.py
 
 # C extensions
 *.so
