@@ -130,6 +130,10 @@ a.article-title:hover {
   vertical-align: middle;
 }
 
+.ckeditor-html5-video video{
+  max-width: 100%;
+}
+
 .account-img {
   height: 125px;
   width: 125px;
@@ -313,4 +317,14 @@ a.article-title:hover {
   background: #ff6767;
   z-index: 12;
   border-radius: 6px 6px 0 0;
+}
+
+.gnbox li{ 
+  float:left;
+  margin-left: 2.5%;
+  margin-top: 2.5%;
+  width: 30%;
+  height: 128px;
+  border-radius:3px; 
+  overflow:hidden;
 }

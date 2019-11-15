@@ -86,8 +86,9 @@
                         { name: 'forms', items: [ 'Form', 'Checkbox', 'Radio', 'TextField', 'Textarea', 'Select', 'Button', 'ImageButton', 'HiddenField' ] },
                         '/',
                         { name: 'paragraph', items: [ 'JustifyLeft', 'JustifyCenter', 'JustifyRight', 'JustifyBlock', '-','liststyle', 'NumberedList', 'BulletedList', '-', 'Outdent', 'Indent', '-', 'BidiLtr', 'BidiRtl', 'HorizontalRule','PageBreak'] },
-                        { name: 'links', items: [ 'Link', 'Unlink', 'Anchor' ] },
+                        
                         { name: 'insert', items: [ 'base64image', 'Table', 'Image', 'html5video', 'Flash', 'CodeSnippet', 'Smiley', 'EqnEditor', 'SpecialChar' ] },
+                        { name: 'links', items: [ 'Link', 'Unlink', 'Anchor' ] },
                         { name: 'element', items: ['Blockquote', 'CreateDiv', 'Iframe', '-'] },
                         '/',
                         { name: 'basicstyles', items: [ 'CopyFormatting', 'RemoveFormat' ,'Bold', 'Italic', 'Underline', 'Strike', 'Subscript', 'Superscript'] },
@@ -102,7 +103,7 @@
                 // CSRF token header for XHR request
                 removeDialogTabs:'image:advanced;image:Link',
                 extraPlugins:'filebrowser,codesnippet,imagerotate,html5video,widget,widgetselection,clipboard,lineutils,\
-                              uploadwidget,uploadimage,tabletools,tableresize,eqneditor,\
+                              uploadwidget,uploadimage,tabletools,tableresize,eqneditor,fakeobjects,link,\
                               base64image,autoembed,autolink,undo,textmatch,lineheight,liststyle',
                 });
             editor.addCommand( 'html5video', new CKEDITOR.dialogCommand( 'html5video' ) );

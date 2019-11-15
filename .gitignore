@@ -6,6 +6,7 @@ __pycache__/
 templates/archive/*
 static/post/uploaded/image-*
 static/post/wordcloud/tags.png
+*/.vs/*
 server hide.py
 
 # C extensions

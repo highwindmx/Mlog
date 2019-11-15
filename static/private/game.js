@@ -13,8 +13,8 @@ $(document).ready(function(){
         var stone_pos = $(this).val();
         // console.log(stone_pos);
         $.getJSON('/game_nim_gen_list', {
-                stone: stone_pos,
-                now: new Date().getTime() // 一种刷新缓存的技巧
+            stone: stone_pos,
+            now: new Date().getTime() // 一种刷新缓存的技巧
             },
             function(data) {
                 // console.log(data);
@@ -26,7 +26,8 @@ $(document).ready(function(){
                     $("#nim-player1").toggle();
                     $("#nim-player2").toggle();
                 }
-        });
+            }
+        );
         // $("#nim-player1").toggle();
         // $("#nim-player2").toggle();
         // $.ajax({
@@ -44,5 +45,19 @@ $(document).ready(function(){
         //         console.log("notcool");
         //     }
         // });
+    });
+    $('#button-24-sw').on('click', function(){
+        $('.cards-24-exp').show();
+    });
+    $('#button-24-rd').click(function(){
+        $('.cards-24-exp').hide();
+        $.getJSON('/game_24_point', {
+            now: new Date().getTime() // 一种刷新缓存的技巧
+            },
+            function(data) {
+                $('.cards-24-list').html(data.cards_layout);
+                $('.cards-24-exp').html(data.av_exp_layout);
+            }
+        );
     });
 });

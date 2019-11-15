@@ -11,17 +11,22 @@
         <link rel="shortcut icon" href="{{ url_for('static', filename='private/favicon/mlog.ico') }}">
 
         <!--加载JS-->
-        <script src="{{ url_for('static', filename='public/jquery-3.3.1.slim.min.js') }}"></script>
+        <script src="{{ url_for('static', filename='public/jquery-3.4.1.min.js') }}"></script>
         <script src="{{ url_for('static', filename='public/popper.min.js') }}"></script>
         <script src="{{ url_for('static', filename='vendor/bootstrap-4.3.1-dist/js/bootstrap.js') }}"></script>
         <!--<script src="{{ url_for('static', filename='vendor/ckeditor-4.9.2-full/ckeditor.js') }}"></script>-->
         {{ ckeditor.load(custom_url=url_for('static', filename='vendor/ckeditor-4.13.0-full-Build3/ckeditor.js')) }}
+        <script src="{{ url_for('static', filename ='vendor/fontawesome-free-5.11.2-web/js/all.js') }}"></script>
         <script src="{{ url_for('static', filename='vendor/highlightjs/highlight.min.js') }}"></script>
         <script>hljs.initHighlightingOnLoad();</script>
+        <script src="{{ url_for('static', filename='private/game.js') }}"></script>
         <!--加载CSS-->
         <link rel="stylesheet" href="{{ url_for('static', filename='vendor/bootstrap-4.3.1-dist/css/bootstrap.css') }}">
         <link rel="stylesheet" href="{{ url_for('static', filename='vendor/highlightjs/default.min.css') }}">
-        <link rel="stylesheet" href="{{ url_for('static', filename ='vendor/font-awesome-4.7.0/css/font-awesome.min.css') }}" type="text/css">
+        <!-- <link rel="stylesheet" href="{{ url_for('static', filename ='vendor/font-awesome-4.7.0/css/font-awesome.min.css') }}" type="text/css"> -->
+        <link href="{{ url_for('static', filename ='vendor/fontawesome-free-5.11.2-web/css/all.css') }}" rel="stylesheet">
+        <!-- <link href="{{ url_for('static', filename ='vendor/fontawesome-free-5.11.2-web/css/brands.css') }}" rel="stylesheet">
+        <link href="{{ url_for('static', filename ='vendor/fontawesome-free-5.11.2-web/css/solid.css') }}" rel="stylesheet"> -->
         <link rel="stylesheet" href="{{ url_for('static', filename='private/style.css') }}">
     </head>
     <body>
@@ -36,19 +41,22 @@
                         <ul class="navbar-nav mr-auto">
                             <!--<a class="nav-item nav-link" href="/">首页</a>-->
                             <li class="nav-item active">
-                                <a class="nav-link" href="{{ url_for('post_new') }}"><i class="fa fa-pencil fa-fw"></i>写</a>
+                                <a class="nav-link" href="{{ url_for('post_new') }}"><i class="fas fa-pen-alt fa-fw"></i>写</a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link" href="{{ url_for('post_list') }}"><i class="fa fa-th-list fa-fw"></i>列</a>
+                                <a class="nav-link" href="{{ url_for('post_list') }}"><i class="fas fa-th-list fa-fw"></i>列</a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link" href="{{ url_for('post_list_by_tag',post_tag='集合') }}"><i class="fa fa-suitcase fa-fw"></i>集</a>
+                                <a class="nav-link" href="{{ url_for('post_list_by_tag',post_tag='集合') }}"><i class="fas fa-suitcase fa-fw"></i>集</a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link" href="{{ url_for('post_timeline') }}"><i class="fa fa-clock-o fa-spin fa-fw"></i>时</a>
+                                <a class="nav-link" href="{{ url_for('post_timeline') }}"><i class="fas fa-clock fa-spin fa-fw"></i>时</a>
                             </li>
                             <li class="nav-item">
-                                <a class="nav-link" href="{{ url_for('science') }}"><i class="fa fa-flask fa-fw"></i>科</a>
+                                <a class="nav-link" href="{{ url_for('science') }}"><i class="fas fa-flask fa-fw"></i>科</a>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link" href="{{ url_for('game') }}"><i class="fas fa-gamepad fa-fw"></i>玩</a>
                             </li>
                         </ul>
                         <!--右侧部分-->
@@ -64,16 +72,16 @@
                                             {% endfor %}
                                         </div>
                                     {% else %}
-                                        <i class="fa fa-search fa-flip-horizontal fa-fw"></i>
+                                        <i class="fas fa-search fa-flip-horizontal fa-fw"></i>
                                         {{ forms.search_term(class='form-control mr-sm-2',type='search',placeholder='有些啥？') }}
                                     {% endif %}     
                                 </div>
                                 <div>
-                                    {{ forms.submit(class='btn btn-outline-secondary my-2 my-sm-0 mr-4') }}
+                                    {{ forms.submit(class='form-inline btn btn-outline-secondary my-2 my-sm-0 mr-4') }}
                                 </div>
                             </form>
                             <a class="nav-item nav-link" href="{{ url_for('post_show',post_id='5da7f71637f2bc83802d66b2') }}">
-                                <i class="fa fa-info fa-border fa-fw"></i>约
+                                <i class="fas fa-info fa-border fa-fw"></i>约
                             </a>
                         </div>
                     </div>

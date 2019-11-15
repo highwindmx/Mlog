@@ -31,7 +31,7 @@
         </div>
         <p>{{ post.body|safe }}</p>
         <div class="article-footer d-flex justify-content-between">
-            <small class="text-muted"><i class="fa fa-eye fa-fw"></i>已被阅览 {{ post.view_count }} 次</small>
+            <small class="text-muted"><i class="fas fa-eye fa-fw"></i>已被阅览 {{ post.view_count }} 次</small>
             <div class="list-inline">
                 {% for kwd in post.keywords%}
                     <div class="list-inline-item article-keyword" ><a style="color:#007acc;" href="{{ url_for('post_list_by_tag', post_tag=kwd) }}">{{ kwd }}</a></div>

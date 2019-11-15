@@ -1,7 +1,9 @@
 import os,re,calendar
 from datetime import datetime
 import random
+import itertools
 from pathlib import Path
+import json
 from uuid import getnode as get_mac
 from flask import Flask, render_template, redirect, request, url_for, flash
 from flask import current_app, session, send_from_directory, jsonify
@@ -94,6 +96,43 @@ class DataPost(db.Document):
 class GameNim(db.Document):
     layout = db.ListField()
 
+class GameDarkChess(db.Document):
+    board = db.DictField()
+
+class DarkChessPiece():
+    def __init__(self, idx, side, name, rank, hit_rank, img_ord):
+        self.id = idx
+        self.side = side
+        self.name = name    
+        self.rank = rank
+        self.hit_rank = hit_rank
+        self.img = ""
+        self.img_b = url_for('static', filename='private/game/darkchess/back.png') 
+        self.img_p = url_for('static', filename='private/game/darkchess/'+img_ord+'.png')
+        self.select_range = (8, 162) # sum=170~171
+        self.img_s = url_for('static', filename='private/game/darkchess/select.png')
+        self.stat = 1 # 0=反面，1=正面，-1=被吃掉
+        self.pos = ()
+
+    def get_img(self):
+        if self.stat == 0:
+            self.img = self.img_b
+        elif self.stat == 1:
+            self.img = self.img_p
+        else:
+            pass
+
+    def set_pos(self, pos):
+        self.pos = pos
+
+    def flip(self):
+        self.stat = 1
+        self.get_img()
+
+### 全局变量
+nim_game = GameNim()
+nim_game.save()
+
 ### 使用函数
 def get_calendar():
     calendar.setfirstweekday(firstweekday=6) #0是周一，6是周日
@@ -161,8 +200,29 @@ def show_nim_stat(layout):
         return True, nim_num
     return False, nim_num
 
-### 全局变量
-nim_game = GameNim()
+def gen_24_cards():
+    cards = itertools.combinations_with_replacement([x for x in range(1,11,1)],4) #list(range(1,11))
+    return random.choice(list(cards))
+
+def get_24_card_exp(card):
+    avexp = set()
+    for nums in itertools.permutations(card):
+        for ops in itertools.product('+-/*', repeat=3):
+            exp1 = "({0}{4}{1}){5}({2}{6}{3})".format(*nums, *ops) #(a+b)*(c-d)
+            exp2 = "(({0}{4}{1}){5}{2}){6}{3}".format(*nums, *ops) #(a+b)*c-d
+            exp3 = "{0}{4}({1}{5}({2}{6}{3}))".format(*nums, *ops) #a/(b-(c*d))
+
+            for exp in [exp1, exp2, exp3]:
+                try:
+                    if abs(eval(exp) -24.0) < 1e-10:
+                        avexp.add(exp)
+                except ZeroDivisionError:
+                    continue
+    if avexp:
+        return avexp
+    else:
+        return {'四则运算范围内无解:('}
+
 
 ### 路径与视图
 @app.route('/')
@@ -386,6 +446,9 @@ def game():
     nim_game = GameNim.objects.first_or_404()
     nim_game.layout = gen_nim_list()
     nim_game.save()
+    card_list = gen_24_cards()
+    av_exp = get_24_card_exp(card_list)
+    print(av_exp)
     return render_template('game.html',
             sideinfo="game",
             posts_count=DataPost.objects.count(),
@@ -397,7 +460,9 @@ def game():
             mediabase_size=cal_base_size(DataPost)[1],
             num_lst=gen_guess_num_list(),
             #nim_lst=gen_nim_list()
-            nim_lst=nim_game.layout
+            nim_lst=nim_game.layout,
+            card_lst=card_list,
+            av_exp = av_exp
             )
 
 @app.route('/game_guess_get_num')
@@ -424,6 +489,13 @@ def get_nim_list():
             'nim_num':nim_num,
             'nim_w_o_l':win_or_loss}
         )
+
+@app.route('/game_24_point')
+def get_24_exp():
+    card_list = gen_24_cards()
+    av_exp = get_24_card_exp(card_list)
+    return jsonify({'cards_layout':render_template('game_24_list.html', card_lst = card_list),
+                    'av_exp_layout':render_template('game_24_exp.html', av_exp = av_exp)})
 
 @app.errorhandler(404)
 def error_404(error):
