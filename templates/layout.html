@@ -68,7 +68,7 @@
                                         {{ forms.search_term(class='form-control mr-sm-2 is-invalid',type='search',placeholder='有些啥？') }}
                                         <div class="invalid-feedback">
                                             {% for error in forms.search_term.errors %}
-                                                <span>{{ error }}</span><!--但是此次如何反馈国际化（中文）错误提示呢？-->
+                                                <span>{{ error }}</span><!--但是此处如何反馈国际化（中文）错误提示呢？-->
                                             {% endfor %}
                                         </div>
                                     {% else %}

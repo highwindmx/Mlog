@@ -29,12 +29,29 @@ app.config['CKEDITOR_SERVE_LOCAL'] = True
 app.config['CKEDITOR_FILE_UPLOADER'] = 'post_img_upload'
 app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 0 #用来强制刷新静态图片
 MACHINE_MAC = get_mac()
-if MACHINE_MAC == 20000: # getMAC
-    # app.config["MONGO_URI"] = "mongodb://localhost:port/mlog"
+# 88714481176714: IdeaCenter
+# 220812856383109: Laptop
+# 66160495517597：FSZ
+if MACHINE_MAC == 88714481176714: # IdeaCenter
+    # app.config["MONGO_URI"] = "mongodb://localhost:27017/mlog"
     app.config['MONGODB_SETTINGS'] = {
         'db': 'mlog',
         'host': 'localhost',
-        'port': 2222
+        'port': 27016
+    }
+elif MACHINE_MAC == 220812856383109: # Laptop
+    # app.config["MONGO_URI"] = "mongodb://:27017/mlog" 
+    app.config['MONGODB_SETTINGS'] = {
+        'db': 'mlog',
+        #'host': '192.168.3.6', #需要配置远程mongod配置文件，设置bind_ip_all=true
+        'host': '192.168.1.10', #需要配置远程mongod配置文件，设置bind_ip_all=true
+        'port': 27017
+    }
+elif MACHINE_MAC == 66160495517597:
+    app.config['MONGODB_SETTINGS'] = {
+        'db': 'mlog',
+        'host': 'localhost', #需要配置远程mongod配置文件，设置bind_ip_all=true
+        'port': 27017
     }
 else:
     print("Wrong Machine!!")
@@ -228,6 +245,7 @@ def get_24_card_exp(card):
 @app.route('/')
 @app.route('/index')
 def index():
+    session['search_for'] = "" # 每次刷新主页时冲洗搜索池
     tags_freq = DataPost.objects.item_frequencies('keywords')
     get_wordcloud(tags_freq)
     return redirect(url_for("post_list"))
@@ -404,17 +422,22 @@ def post_img_upload():
     f_url = url_for('upload_file', filename=f.filename)
     return upload_success(url = f_url)
 
-@app.route('/post/search/', methods=['POST'])
+@app.route('/post/search/', methods=['GET','POST'])
 def post_search():
     # if post.author != current_user:
     #     abort(403)
+    page = request.args.get('page', 1, type=int)
     formS = FormSearch()
     if formS.validate_on_submit():
         swd=formS.search_term.data
-        page = request.args.get('page', 1, type=int)
-        posts = DataPost.objects(body_plain__icontains=swd).order_by('-created_at').paginate(page=page, per_page=3)
+        session['search_for'] = swd # 采用session避免页面跳转时，search for关键词丢失
+    elif request.method == 'GET':
+        swd = session['search_for']
+        #swd = request.args.get('searchfor', "", type=str)
+    posts = DataPost.objects(Q(body_plain__icontains=swd) | Q(title__icontains=swd) | Q(keywords__icontains=swd)).order_by('-created_at').paginate(page=page, per_page=3)
+        # posts = DataPost.objects(body_plain__icontains=swd).order_by('-created_at').paginate(page=page, per_page=3)
         # posts = DataPost.objects.search_text(swd).order_by('$text_score').paginate(page=page, per_page=3) # 目前还不支持中文
-    return render_template('post_show_mul.html',
+    return render_template('post_show_search.html',
             sideinfo="post",
             posts=posts, 
             posts_count=DataPost.objects.count(),
@@ -504,7 +527,11 @@ def error_404(error):
 
 ### 运行服务
 if __name__ == "__main__":
-    if MACHINE_MAC == 20000: 
-        app.run(debug=True, host='127.0.0.1', port='88')
+    if MACHINE_MAC == 88714481176714: # IdeaCenter
+        app.run(debug=True, host='0.0.0.0', port='8112')
+    elif MACHINE_MAC == 220812856383109: # Laptop
+        app.run(debug=True, host='127.0.0.1', port='7112')
+    elif MACHINE_MAC == 66160495517597: # FSZ
+        app.run(debug=True, host='127.0.0.1', port='6112')
     else:
         print("Wrong Machine???")

@@ -1,7 +1,13 @@
 <div class="content-section" style="min-width: 310px;">
     <span class="row ml-2"><h3>畅所欲言</h3></span>
     <p class="text-muted">一本好书需要你一页一页翻到最后</p>
-    <span><h6 class="small text-muted mt-3">（已发布 {{ posts_count }}篇，数据库：{{ database_size|round(1, 'floor') }}M，媒体库：{{ mediabase_size|round(1, 'floor') }}M）</h6></span>
+    <span><h6 class="small text-muted mt-3">
+        <ul class="list-group">
+            <li class="list-group-item">已发布：{{ posts_count }}篇</li>
+            <li class="list-group-item">数据库：{{ database_size|round(1, 'floor') }}M</li>
+            <li class="list-group-item">媒体库：{{ mediabase_size|round(1, 'floor') }}M</li>
+        </ul>
+    </h6></span>
     <ul class="list-group">
         <li class="list-group-item list-group-item-light">本页</li>
         <li class="list-group-item list-group-item-light">

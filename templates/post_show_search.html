@@ -1,0 +1,78 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<div class="col-md-8">
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <div class="alert alert-{{ category }}">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+    {% if posts.items %}
+        {% for post in posts.items %}
+            <div class="content-section">
+                <h4><a class="article-title link" href="{{ url_for('post_show',post_id=post.id) }}">{{ post.title }}</a></h4>
+                <div class="article-metadata d-flex justify-content-between">
+                    <p class="mr-2 text-muted">由 {{ post.author.name }} 于 {{ post.created_at.strftime('%Y-%m-%d %H:%M') }}发布，{{ post.edited_at.strftime('%Y-%m-%d %H:%M') }}完成最后一次编辑</p>
+                </div>
+                <p>{{ post.body|safe }}</p>
+                <div class="article-footer d-flex justify-content-between">
+                    <small class="text-muted"><i class="fas fa-eye fa-fw"></i>已被阅览 {{ post.view_count }} 次</small>
+                    <div class="list-inline">
+                        {% for kwd in post.keywords%}
+                            <div class="article-keyword list-inline-item"><a style="color:#007acc;" href="{{ url_for('post_list_by_tag', post_tag=kwd) }}">{{ kwd }}</a></div>
+                        {% endfor %}
+                    </div>       
+                    <a href="#" class="small font-italic font-weight-light" id="sdel" data-toggle="modal" data-target="#deleteModal{{ post.id }}">删除</a>
+                </div>
+                <!--<p>{{ post.comment }}</p>-->
+            </div>
+            <!--Modal-->
+            <div class="modal fade" id="deleteModal{{ post.id }}" tabindex="-1">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="deleteModalLabel">请确认是否要删除以下文章？</h5>
+                            <button type="button" class="close" data-dismiss="modal">
+                                <span>&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">
+                            <h4 class="article-title">{{ post.title }}</h4>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary btn-sm" data-dismiss="modal">取消</button>
+                            <form action="{{ url_for('post_delete', post_id=post.id) }}" method="POST">
+                                <input class="btn btn-danger btn-sm" type="submit" value="删除"></input>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% endfor %}   
+        {% for page_num in posts.iter_pages(left_edge=2, right_edge=2, left_current=2, right_current=3) %}
+            {% if page_num %}
+                {% if posts.page == page_num %}
+                    <a class="btn btn-primary mb-4" href="{{ url_for('post_search', page=page_num) }}">{{ page_num }}</a>
+                {% else %}
+                    <a class="btn btn-outline-primary mb-4" href="{{ url_for('post_search', page=page_num) }}">{{ page_num }}</a>
+                    <!-- href="{{ url_for('post_search', searchfor=forms.search_term.data, page=page_num) }}" -->
+                {% endif %}
+            {% else %}ss
+                ...
+            {% endif %}
+        {% endfor %}
+    {% else %}
+        <div class="content-section">
+            <h4><div class="article-title link">啥都没找到！</div></h4>
+        </div>
+    {% endif %}
+</div>
+<div class="col-md-4">
+    {% include "side_layout.html" %}
+</div>
+{% endblock content %}
+

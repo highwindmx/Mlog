@@ -98,7 +98,6 @@
                     <span id="nim-player2" style="display: none;">
                         <h3>玩家2扔石头</h3><h3 class="nim-win-loss" style="display: none;">胜利</h3>
                     </span>
-                    <p id="nim-number" class="text-muted"></p>
                     <ul id="nim-layout">
                         {% set row = namespace(value=0) %}
                         {% for i in nim_lst %}
@@ -114,6 +113,7 @@
                         </li>
                         {% endfor %}
                     </ul>
+                    <p id="nim-number" class="text-muted"></p>
                 </div>
             </div>
             <div class="tab-pane fade" id="point-24">
@@ -151,4 +151,3 @@
     {% include "side_layout.html" %}
 </div>
 {% endblock content %}
-
