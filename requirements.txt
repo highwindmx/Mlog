@@ -1,7 +1,7 @@
 mongoengine==0.18.2
 Flask_CKEditor==0.4.3
 Flask_WTF==0.14.2
-Flask==1.1.1
+Flask==2.3.2
 flask_mongoengine==0.9.5
 Flask_Login==0.4.1
 WTForms==2.2.1
